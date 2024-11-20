@@ -199,7 +199,7 @@ The second transaction uses the generated pDate in the URL to make an API call w
 # Usage of REST-API: /executeSQL
 
 This API method is used to execute an SQL query against a specified database and returns the result in JSON format.
-Might potentially be done in the init section, depending on the circumstances. Or in the end section to verify data.
+Might potentially be done in the init section, depending on the circumstances or in the end section to verify data.
 
 **HTTP Method**: POST  
 **URL**: https://your-endpoint/executeSQL
