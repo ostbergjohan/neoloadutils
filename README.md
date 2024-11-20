@@ -276,7 +276,7 @@ This API generates a UUID that can be used in your test script.
 
 ### **Docker Hub Image**  
 The application is available on Docker Hub:  
-[**Docker Hub - NeoLoad Utils**]([https://hub.docker.com/repository/docker/johanostberg/neoloadcompare](https://hub.docker.com/repository/docker/johanostberg/neoloadutils))
+[**Docker Hub - NeoLoad Utils**](https://hub.docker.com/repository/docker/johanostberg/neoloadutils)
 
 ### **Running with Docker**  
 To run the application, use the following command:  
