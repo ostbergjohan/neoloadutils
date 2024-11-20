@@ -270,6 +270,7 @@ This API generates a UUID that can be used in your test script.
 {
   "uuid": "a003cac8-49a3-498d-9559-ca27a307a56b"
 }
+```
 
 ## **Running the Application**
 
