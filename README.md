@@ -271,3 +271,18 @@ This API generates a UUID that can be used in your test script.
   "uuid": "a003cac8-49a3-498d-9559-ca27a307a56b"
 }
 
+## **Running the Application**
+
+### **Docker Hub Image**  
+The application is available on Docker Hub:  
+[**Docker Hub - NeoLoad Utils**]([https://hub.docker.com/repository/docker/johanostberg/neoloadcompare](https://hub.docker.com/repository/docker/johanostberg/neoloadutils))
+
+### **Running with Docker**  
+To run the application, use the following command:  
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -e Server=<neoloadapi_server> \
+  -e Token=<admin_token> \
+  johanostberg/neoloadutils:latest
+```
