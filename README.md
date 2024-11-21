@@ -102,8 +102,8 @@ Skip Weekends:
 To skip weekends (i.e., ensure the generated date is a weekday), you can modify the request:
 
 #### Request:
-```json
 POST https://your-endpoint/getparameter
+```json
 {
   "dateformatter_weekdays": "yyyy-MM-dd HH:mm:ss z",
   "daysToAddOrSubtract": "0"
