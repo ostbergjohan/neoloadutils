@@ -283,7 +283,5 @@ To run the application, use the following command:
 ```bash
 docker run -d \
   -p 8080:8080 \
-  -e Server=<neoloadapi_server> \
-  -e Token=<admin_token> \
   johanostberg/neoloadutils:latest
 ```
