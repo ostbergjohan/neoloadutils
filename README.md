@@ -1,4 +1,4 @@
-# NeoLoad Utils: A helper application designed to provide additional functionality during performance testing with NeoLoad Test-as-Code (also compatible with other tools).
+# NeoLoad Utils: A helper application designed to provide additional functionality during performance testing with NeoLoad Test-as-Code (also compatible with other tools like jmeter and k6).
 
 ## API Calls for Pacing
 
