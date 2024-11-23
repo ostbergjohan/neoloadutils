@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoLoad Utilities</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>NeoLoad Utilities</h1>
+
+    <div class="section">
+        <h2>Pacing</h2>
+        <p>API calls for pacing:</p>
+        <ul>
+            <li>At the start of an iteration:
+                <code>https://neoloadutils-endpoint/setpacing</code>
+            </li>
+            <li>At the end of an iteration:
+                <code>https://neoloadutils-endpoint/getpacing?guid=2602c87e-b736-4d8c-b7fe-ba62916875fd&totalPacingTimeMillis=1000</code>
+            </li>
+        </ul>
+        <p>
+            NeoLoadUtils automatically randomizes the pacing value between <strong>0.75</strong> and
+            <strong>1.25</strong> for better distribution.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Date/Timestamp</h2>
+        <p>Create a date parameter for use in your test script:</p>
+        <p><strong>POST:</strong> <code>https://neoloadutils-endpoint/getparameter</code></p>
+        <pre>
+{
+    "dateformatter": "yyyy-MM-dd HH:mm:ss z",
+    "daysToAddOrSubtract": "0"
+}
+            </pre>
+        <p><strong>Response:</strong> <code>{"date":"2024-10-15 13:58:10 CEST"}</code></p>
+        <p>To skip weekends, use:</p>
+        <pre>
+{
+    "dateformatter_weekdays": "yyyy-MM-dd HH:mm:ss z",
+    "daysToAddOrSubtract": "0"
+}
+            </pre>
+        <p><strong>Response:</strong> <code>{"date":"2024-10-15 13:58:10 CEST"}</code></p>
+        <p>Examples of <code>DateTimeFormatter</code>:</p>
+        <ul>
+            <li><code>yyyy</code>: Year (e.g., 2024)</li>
+            <li><code>MM</code>: Month (01 to 12)</li>
+            <li><code>dd</code>: Day of the month (01 to 31)</li>
+            <li><code>HH</code>: Hour (24-hour clock)</li>
+            <li><code>mm</code>: Minute</li>
+            <li><code>ss</code>: Second</li>
+            <li><code>EEEE</code>: Day of the week (e.g., Monday)</li>
+            <li><code>MMMM</code>: Full month name (e.g., October)</li>
+        </ul>
+        <p>Reference: <a href="https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html" target="_blank">DateTimeFormatter (Java Platform SE 8)</a></p>
+    </div>
+
+    <div class="section">
+        <h2>Generate a UUID</h2>
+        <p><strong>GET:</strong> <code>https://neoloadutils-endpoint/getuuid</code></p>
+        <p><strong>Response:</strong> <code>{"uuid":"a003cac8-49a3-498d-9559-ca27a307a56b"}</code></p>
+    </div>
+
+    <div class="section">
+        <h2>Swagger UI</h2>
+        <p>Visit Swagger UI for more details:</p>
+        <p><a href="/swagger-ui/index.html#/">Swagger UI</a></p>
+    </div>
+</div>
+</body>
+</html>
