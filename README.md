@@ -272,6 +272,96 @@ This API generates a UUID that can be used in your test script.
 }
 ```
 
+# Additional Endpoints
+
+## Adding and Retrieving URLs
+
+### Add URL
+
+**Endpoint:** `/addurl`  
+**Method:** GET  
+
+**Description:** Allows users to store URLs with an accompanying explanation.
+
+**Parameters:**
+
+- **url** (*String*): The URL to be saved.
+- **explanation** (*String*): Description of the URL.
+
+**Response:**  
+Returns a confirmation message that the URL has been successfully saved.
+
+---
+
+### Get URLs
+
+**Endpoint:** `/geturl`  
+**Method:** GET  
+
+**Description:** Displays a list of previously added URLs and their explanations in an HTML page.
+
+---
+
+## Convert HTTP Requests to JSON Format
+
+**Endpoint:** `/convertHTTP`  
+**Method:** POST  
+
+**Description:** Converts raw HTTP request text into a structured JSON format, extracting method, headers, URL, and body content.
+
+# Generate NeoLoad YAML Configuration
+
+**Endpoint:** `/NeoLoadYamlGenerator`  
+**Method:** POST  
+
+**Description:**  
+Accepts a JSON payload and generates a NeoLoad-compatible YAML file for test execution.
+
+**Expected Request Body:**
+
+```json
+{
+  "name": "Test Scenario",
+  "scenario": "TestScenario1",
+  "pacing": "1000",
+  "users": 10,
+  "duration": 5,
+  "userpathname": "example_userpath",
+  "transactions": [
+    {
+      "name": "API Call 1",
+      "url": "https://api.example.com/data",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer xyz"
+      }
+    }
+  ]
+}
+```
+**Example YAML Output:**
+```yaml
+name: Test Scenario
+variables:
+  - constant:
+      name: pPacing
+      value: 1000
+sla_profiles:
+  - name: sla
+    thresholds:
+      - error-rate warn >= 0.1% fail >= 0.2% per test
+scenarios:
+  - name: TestScenario1
+    description: update
+    sla_profile: sla
+    populations:
+      - name: pop_example_userpath
+        constant_load:
+          users: 10
+          duration: 5m
+```
+
+
 ## **Running the Application**
 
 ### **Docker Hub Image**  
