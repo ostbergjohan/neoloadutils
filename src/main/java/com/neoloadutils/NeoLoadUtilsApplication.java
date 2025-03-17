@@ -286,7 +286,8 @@ public class NeoLoadUtilsApplication {
         // Start pacing request
         if (!"0".equals(pacing)) {
             actions.add(Map.of("request", Map.of(
-                    "url", serverUrl + "/setpacing"
+                    "url", serverUrl + "/setpacing",
+                    "extractors", List.of(Map.of("name", "pUUID", "jsonpath", "$.uuid"))
             )));
         }
 
