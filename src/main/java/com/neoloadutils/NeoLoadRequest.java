@@ -1,4 +1,4 @@
-package se.af.neoloadutils;
+package com.neoloadutils;
 
 import java.util.List;
 import java.util.Map;
