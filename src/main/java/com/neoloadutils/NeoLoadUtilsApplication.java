@@ -284,10 +284,11 @@ public class NeoLoadUtilsApplication {
         List<Map<String, Object>> actions = new ArrayList<>();
 
         // Start pacing request
-        actions.add(Map.of("request", Map.of(
-                "url", serverUrl + "/setpacing",
-                "extractors", List.of(Map.of("name", "pUUID", "jsonpath", "$.uuid"))
-        )));
+        if (!"0".equals(pacing)) {
+            actions.add(Map.of("request", Map.of(
+                    "url", serverUrl + "/setpacing"
+            )));
+        }
 
         JSONArray transactionsArray = jsonObject.getJSONArray("transactions");
 
@@ -427,10 +428,11 @@ public class NeoLoadUtilsApplication {
                actions.add(Map.of("transaction", transaction));
         }
         // End pacing request
-        actions.add(Map.of("request", Map.of(
-                "url", serverUrl + "/getpacing?guid=${pUUID}&totalPacingTimeMillis=${pPacing}"
-        )));
-
+        if (!"0".equals(pacing)) {
+            actions.add(Map.of("request", Map.of(
+                    "url", serverUrl + "/getpacing?guid=${pUUID}&totalPacingTimeMillis=${pPacing}"
+            )));
+        }
         userPath.put("actions", Map.of("steps", actions));
         yamlData.put("user_paths", List.of(userPath));
 
