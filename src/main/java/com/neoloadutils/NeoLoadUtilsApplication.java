@@ -613,9 +613,7 @@ public class NeoLoadUtilsApplication {
             Duration timeAlreadySpentMillis = Duration.between( getTimestamp(guid),Instant.now());
             remainingPacingTimeMillis = Long.valueOf(totalPacingTimeMillis) - timeAlreadySpentMillis.toMillis();
             if (remainingPacingTimeMillis < 0) { remainingPacingTimeMillis=0; };
-            Random random = new Random();
-            long randomValue = (long) (0.75 + (1.25 - 0.75) * random.nextDouble());
-            Thread.sleep(remainingPacingTimeMillis*randomValue);
+            Thread.sleep(remainingPacingTimeMillis);
             removeUUID(guid);
         } catch (NumberFormatException e) {
             colorLogger.logError("uuid not found");
