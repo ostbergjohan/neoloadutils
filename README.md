@@ -10,8 +10,6 @@ https://your-endpoint/setpacing
  **At the end of an iteration** (with pacing information):
 https://your-endpoint/getpacing?guid=2602c87e-b736-4d8c-b7fe-ba62916875fd&totalPacingTimeMillis=1000
 
-NeoLoad utilities randomize the pacing value between 0.75 and 1.25 for better distribution.
-
 Be aware of platform limitations. For example, in OpenShift route has a default timeout of 30 seconds (which can be modified). This means pacing durations should not exceed this limit and typically don't need adjustment for use in continuous performance testing.
 ### Trend View Consideration in NeoLoad Web
 In the trend view, requests used to create pacing should be ignored, as they are additional calls specifically for pacing and may skew the results.
