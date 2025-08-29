@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.neoloadutils.NeoLoadRequest;
+import se.af.neoloadutils.NeoLoadRequest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -198,16 +198,6 @@ public class NeoLoadUtilsApplication {
         Map<String, Object> yamlData = new LinkedHashMap<>();
         yamlData.put("name", name);
 
-        // Variables
-        /*
-        List<Map<String, Object>> variables = new ArrayList<>();
-        Map<String, Object> constantVar = new LinkedHashMap<>();
-        constantVar.put("constant", Map.of("name", "pPacing", "value", pacing));
-        variables.add(constantVar);
-
-        yamlData.put("variables", variables);
-        */
-
 // Variables
         List<Map<String, Object>> variables = new ArrayList<>();
         Map<String, Object> constantVar = new LinkedHashMap<>();
@@ -383,6 +373,7 @@ public class NeoLoadUtilsApplication {
                 if (!extractorsList.isEmpty()) {
                     transaction.put("name", jsontransaction.getString("name"));
                     transaction.put("description", "generated");
+                    transaction.put("sla_profile", "sla");
                     transaction.put("steps", List.of(Map.of("request", Map.of(
                             "url", jsontransaction.getString("url"),
                             "method", method,
@@ -394,6 +385,7 @@ public class NeoLoadUtilsApplication {
                 }else{
                     transaction.put("name", jsontransaction.getString("name"));
                     transaction.put("description", "generated");
+                    transaction.put("sla_profile", "sla");
                     transaction.put("steps", List.of(Map.of("request", Map.of(
                             "url", jsontransaction.getString("url"),
                             "method", method,
@@ -484,6 +476,39 @@ public class NeoLoadUtilsApplication {
 
         // Return the result as a JSON response
         return ResponseEntity.ok(SQLresult.toString(4));
+    }
+
+    @PostMapping("/executeNonSelectSQL")
+    public ResponseEntity<String> executeNonSelectSQL(@RequestBody String QueryRequest) {
+
+        // Parse the JSON string
+        JSONObject jsonObject = new JSONObject(QueryRequest);
+
+        // Validate required keys
+        String[] requiredKeys = {"query", "jdbc", "user", "password"};
+        for (String key : requiredKeys) {
+            if (!jsonObject.has(key)) {
+                return logAndRespondError("Error executing SQL query, Missing required key: " + key);
+            }
+        }
+        SQLExecutionResult SQLresult;
+        try {
+            SQLresult = executeNonSelectSQL(
+                    jsonObject.getString("query"),
+                    jsonObject.getString("jdbc"),
+                    jsonObject.getString("user"),
+                    jsonObject.getString("password")
+            );
+        } catch (SQLException e) {
+            return logAndRespondError("Error executing SQL query: " + e);
+        }
+
+        // Access the JSON result and rounded time
+        JSONObject jsonResult = SQLresult.jsonResult;
+        double roundedTimeSeconds = SQLresult.timeTakenSeconds;
+
+        // Return the result as a JSON response
+        return ResponseEntity.ok(SQLresult.jsonResult.toString(4));
     }
 
     @GetMapping(value = "healthcheck")
@@ -613,6 +638,8 @@ public class NeoLoadUtilsApplication {
             Duration timeAlreadySpentMillis = Duration.between( getTimestamp(guid),Instant.now());
             remainingPacingTimeMillis = Long.valueOf(totalPacingTimeMillis) - timeAlreadySpentMillis.toMillis();
             if (remainingPacingTimeMillis < 0) { remainingPacingTimeMillis=0; };
+            Random random = new Random();
+            //long randomValue = (long) (0.75 + (1.25 - 0.75) * random.nextDouble());
             Thread.sleep(remainingPacingTimeMillis);
             removeUUID(guid);
         } catch (NumberFormatException e) {
@@ -762,6 +789,77 @@ public class NeoLoadUtilsApplication {
         public void logError(String logging) {
             LOGGER.error("\u001B[91m" + logging + "\u001B[0m");
         }
+    }
+
+    public class SQLExecutionResult {
+        public final JSONObject jsonResult;
+        public final double timeTakenSeconds;
+
+        public SQLExecutionResult(JSONObject jsonResult, double timeTakenSeconds) {
+            this.jsonResult = jsonResult;
+            this.timeTakenSeconds = timeTakenSeconds;
+        }
+    }
+
+    public SQLExecutionResult executeNonSelectSQL(String query, String jdbc, String user, String password) throws SQLException {
+        JSONObject result = new JSONObject();
+        JSONArray executedStatements = new JSONArray();
+
+        long startTime = System.nanoTime();  // Start time measurement
+
+        try (Connection conn = DriverManager.getConnection(jdbc, user, password);
+             Statement stmt = conn.createStatement()) {
+
+            conn.setAutoCommit(false);  // Begin transaction
+
+            String[] statements = query.split(";");
+            for (String sql : statements) {
+                sql = sql.trim();
+                if (sql.isEmpty()) continue;
+
+                if (sql.toLowerCase().startsWith("select")) {
+                    throw new SQLException("SELECT queries are not allowed in this method.");
+                }
+
+                stmt.addBatch(sql);  // Add SQL to batch
+
+                // Periodically execute the batch to avoid memory overflow
+                if (executedStatements.length() % 100 == 0) {
+                    executeBatchAndClear(stmt, executedStatements);
+                }
+            }
+
+            // Execute remaining batch
+            executeBatchAndClear(stmt, executedStatements);
+
+            conn.commit();  // Commit if all succeed
+
+            long endTime = System.nanoTime();  // End time measurement
+            double durationSeconds = (endTime - startTime) / 1_000_000_000.0;
+            double roundedTime = Math.round(durationSeconds * 100.0) / 100.0;
+
+            result.put("executed", executedStatements);
+            result.put("status", "success");
+            result.put("timeTakenSeconds", roundedTime);
+
+            return new SQLExecutionResult(result, roundedTime);
+
+        } catch (SQLException e) {
+            result.put("status", "error");
+            result.put("message", e.getMessage());
+            throw e;
+        }
+    }
+
+
+    private void executeBatchAndClear(Statement stmt, JSONArray executedStatements) throws SQLException {
+        int[] updateCounts = stmt.executeBatch();
+        for (int updateCount : updateCounts) {
+            JSONObject log = new JSONObject();
+            log.put("updateCount", updateCount);
+            executedStatements.put(log);
+        }
+        stmt.clearBatch();  // Clear the batch after execution
     }
 
 

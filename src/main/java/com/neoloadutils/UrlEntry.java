@@ -1,4 +1,5 @@
 package com.neoloadutils;
+
 import java.time.LocalDateTime;
 
 public class UrlEntry {
