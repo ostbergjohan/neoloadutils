@@ -358,18 +358,3 @@ scenarios:
           users: 10
           duration: 5m
 ```
-
-
-## **Running the Application**
-
-### **Docker Hub Image**  
-The application is available on Docker Hub:  
-[**Docker Hub - NeoLoad Utils**](https://hub.docker.com/repository/docker/johanostberg/neoloadutils)
-
-### **Running with Docker**  
-To run the application, use the following command:  
-```bash
-docker run -d \
-  -p 8080:8080 \
-  johanostberg/neoloadutils:latest
-```
