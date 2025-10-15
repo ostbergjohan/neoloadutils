@@ -3,6 +3,9 @@ package com.neoloadutils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import se.af.neoloadutils.NeoLoadRequest;
+import com.neoloadutils.NeoLoadRequest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,6 +33,59 @@ import java.util.*;
 import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@OpenAPIDefinition(
+        info = @Info(
+                title = "NeoLoad Utils",
+                version = "v1.0",
+                description = "NeoLoad Utils API provides utility endpoints for performance testing workflows.\n" +
+                        "Endpoints:\n\n" +
+                        "**Health**\n" +
+                        "1. **GET /healthcheck** - API health check.\n\n" +
+                        "**NeoLoad YAML Generation**\n" +
+                        "2. **POST /NeoLoadYamlGenerator** - Generate NeoLoad YAML configuration from JSON payload.\n" +
+                        "   - Generates complete NeoLoad test configuration with scenarios, user paths, and transactions.\n" +
+                        "   - Supports custom pacing, SLA profiles, and variables.\n\n" +
+                        "**HTTP Conversion**\n" +
+                        "3. **POST /convertHTTP** - Convert raw HTTP request format to structured JSON.\n" +
+                        "   - Parses HTTP method, URL, headers, and body.\n" +
+                        "   - Useful for converting captured HTTP requests into test data.\n\n" +
+                        "**Database Operations**\n" +
+                        "4. **POST /executeSQL** - Execute SELECT SQL queries and retrieve results.\n" +
+                        "   - Supports multiple database types (MySQL, PostgreSQL, Oracle, SQL Server, SQLite).\n" +
+                        "   - Returns JSON formatted results with columns and values.\n" +
+                        "   - Optional randomization and row limiting.\n" +
+                        "5. **POST /executeNonSelectSQL** - Execute INSERT/UPDATE/DELETE SQL statements.\n" +
+                        "   - Batch execution support for multiple statements.\n" +
+                        "   - Transaction management with commit/rollback.\n\n" +
+                        "**Pacing & Timing**\n" +
+                        "6. **GET /setpacing** - Initialize pacing timer and get UUID.\n" +
+                        "   - Returns unique identifier for pacing calculation.\n" +
+                        "7. **GET /getpacing** - Calculate and apply pacing delay.\n" +
+                        "   - Parameters: `guid` (UUID), `totalPacingTimeMillis` (desired total time).\n" +
+                        "   - Calculates remaining time and applies delay.\n\n" +
+                        "**Utility Functions**\n" +
+                        "8. **GET /getuuid** - Generate random UUID.\n" +
+                        "9. **POST /getparameter** - Generate formatted dates.\n" +
+                        "   - Supports date arithmetic (add/subtract days).\n" +
+                        "   - Weekday-only calculations available.\n" +
+                        "   - Parameters: `dateformatter`, `daysToAddOrSubtract`.\n\n" +
+                        "**URL Management**\n" +
+                        "10. **GET /addurl** - Add URL with explanation to registry.\n" +
+                        "    - Parameters: `url`, `explanation`.\n" +
+                        "11. **GET /geturl** - Display all registered URLs in HTML format.\n" +
+                        "    - Returns styled HTML table sorted by explanation.\n\n" +
+                        "**Common Use Cases:**\n" +
+                        "- Generate NeoLoad test configurations from API definitions\n" +
+                        "- Parameterize tests with database data\n" +
+                        "- Implement custom pacing strategies\n" +
+                        "- Convert HTTP traces to test transactions\n" +
+                        "- Dynamic date generation for test data\n"
+        ),
+        externalDocs = @ExternalDocumentation(
+                description = "GitHub Repository",
+                url = "https://github.com/ostbergjohan/neoloadutils"
+        )
+)
 @SpringBootApplication
 @RestController
 
