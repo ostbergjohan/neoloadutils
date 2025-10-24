@@ -97,6 +97,15 @@ public class NeoLoadUtilsApplication {
     ColorLogger colorLogger = new ColorLogger();
     HashMap<UUID, Instant> uuidMap = new HashMap<>();
     private List<com.neoloadutils.UrlEntry> urlEntries = new CopyOnWriteArrayList<>();
+    private static final HttpHeaders PACING_HEADERS = createPacingHeaders();
+
+    private static HttpHeaders createPacingHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
+        headers.add(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
+        headers.add(HttpHeaders.CONTENT_ENCODING, "UTF-8");
+        return headers;
+    }
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -279,7 +288,7 @@ public class NeoLoadUtilsApplication {
                 Map<String, Object> fileVar = new LinkedHashMap<>();
                 fileVar.put("file", Map.of(
                         "name", fileName,
-                       // "column_names", columnNames,
+                        // "column_names", columnNames,
                         "is_first_line_column_names", true,         // default value
                         "start_from_line", 1,                          // default value
                         "delimiter", ",",                              // default value
@@ -404,7 +413,7 @@ public class NeoLoadUtilsApplication {
                 }
                 else {
                     body = "default_body"; // or handle appropriately if body is an unknown type
-                 }
+                }
             } else {
                 body = "default_body"; // Default value if "body" is not present
             }
@@ -474,7 +483,7 @@ public class NeoLoadUtilsApplication {
             }
 
             // Transaction
-               actions.add(Map.of("transaction", transaction));
+            actions.add(Map.of("transaction", transaction));
         }
         // End pacing request
         if (!"0".equals(pacing)) {
@@ -636,12 +645,8 @@ public class NeoLoadUtilsApplication {
 
     @GetMapping(value = "setpacing")
     public ResponseEntity<String> setpacing() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
-        headers.add(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
-        headers.add(HttpHeaders.CONTENT_ENCODING, "UTF-8");
         return ResponseEntity.ok()
-                .headers(headers)
+                .headers(PACING_HEADERS)
                 .body("{\"uuid\":\"" + saveUUIDWithTimestamp() + "\"}");
     }
     @GetMapping(value = "getuuid")
@@ -657,58 +662,87 @@ public class NeoLoadUtilsApplication {
 
     @GetMapping(value = "getpacing")
     public ResponseEntity<String> getpacing(@RequestParam UUID guid, @RequestParam String totalPacingTimeMillis) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CACHE_CONTROL, "no-cache");
-        headers.add(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
-        headers.add(HttpHeaders.CONTENT_ENCODING, "UTF-8");
         System.out.println("getpacing");
 
-        if (totalPacingTimeMillis.isEmpty()) {
+        // Early validation - fast fail
+        if (totalPacingTimeMillis == null || totalPacingTimeMillis.isEmpty()) {
             colorLogger.logError("totalPacingTimeMillis is empty");
             return ResponseEntity.internalServerError()
-                    .headers(headers)
+                    .headers(PACING_HEADERS)
                     .body("{\"error\":\"totalPacingTimeMillis is empty\"}");
         }
-        if (guid.toString().isEmpty()) {
+
+        if (guid == null || guid.toString().isEmpty()) {
             colorLogger.logError("guid is empty");
             return ResponseEntity.internalServerError()
-                    .headers(headers)
+                    .headers(PACING_HEADERS)
                     .body("{\"error\":\"guid is empty\"}");
         }
-        if (totalPacingTimeMillis.isEmpty()) {
-            colorLogger.logError("totalPacingTimeMillis is empty");
-            return ResponseEntity.internalServerError()
-                    .headers(headers)
-                    .body("{\"error\":\"String is empty\"}");
-        }
-        for (char c : totalPacingTimeMillis.toCharArray()) {
-            if (!Character.isDigit(c)) {
-                colorLogger.logError("Found a non-digit character");
-                return ResponseEntity.internalServerError()
-                        .headers(headers)
-                        .body("{\"error\":\"Found a non-digit character\"}");
+
+        // Optimized digit validation - use parseLong (much faster than char-by-char)
+        long totalPacingTime;
+        try {
+            totalPacingTime = Long.parseLong(totalPacingTimeMillis);
+            if (totalPacingTime < 0) {
+                throw new NumberFormatException("Negative value");
             }
+        } catch (NumberFormatException e) {
+            colorLogger.logError("Invalid totalPacingTimeMillis: must be a positive number");
+            return ResponseEntity.internalServerError()
+                    .headers(PACING_HEADERS)
+                    .body("{\"error\":\"totalPacingTimeMillis must be a valid positive number\"}");
         }
+
+        // Calculate remaining pacing time
         long remainingPacingTimeMillis;
         try {
-            Duration timeAlreadySpentMillis = Duration.between( getTimestamp(guid),Instant.now());
-            remainingPacingTimeMillis = Long.valueOf(totalPacingTimeMillis) - timeAlreadySpentMillis.toMillis();
-            if (remainingPacingTimeMillis < 0) { remainingPacingTimeMillis=0; };
+            Instant startTime = getTimestamp(guid);
+            if (startTime == null) {
+                colorLogger.logError("UUID not found: " + guid);
+                return ResponseEntity.internalServerError()
+                        .headers(PACING_HEADERS)
+                        .body("{\"error\":\"uuid not found\"}");
+            }
+
+            Duration timeAlreadySpent = Duration.between(startTime, Instant.now());
+            remainingPacingTimeMillis = totalPacingTime - timeAlreadySpent.toMillis();
+
+            // Ensure non-negative remaining time
+            if (remainingPacingTimeMillis < 0) {
+                remainingPacingTimeMillis = 0;
+            }
+
             Random random = new Random();
             //long randomValue = (long) (0.75 + (1.25 - 0.75) * random.nextDouble());
-            Thread.sleep(remainingPacingTimeMillis);
+
+            // Sleep for the remaining time (this is the intentional pacing delay)
+            if (remainingPacingTimeMillis > 0) {
+                Thread.sleep(remainingPacingTimeMillis);
+            }
+
+            // Clean up
             removeUUID(guid);
-        } catch (NumberFormatException e) {
-            colorLogger.logError("uuid not found");
-            return ResponseEntity.internalServerError()
-                    .headers(headers)
-                    .body("{\"error\":\"uuid not found\"}");
+
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt(); // Restore interrupt status
+            colorLogger.logError("Thread interrupted during pacing");
+            return ResponseEntity.internalServerError()
+                    .headers(PACING_HEADERS)
+                    .body("{\"error\":\"pacing interrupted\"}");
         }
+
+        // Use StringBuilder for response body (faster than string concatenation)
+        String responseBody = new StringBuilder()
+                .append("{\"uuid\":\"")
+                .append(guid)
+                .append("\",\"duration\":")
+                .append(remainingPacingTimeMillis)
+                .append("}")
+                .toString();
+
         return ResponseEntity.ok()
-                .headers(headers)
-                .body("{\"uuid\":\"" + guid + "\",\"duration\":"+remainingPacingTimeMillis +"}");
+                .headers(PACING_HEADERS)
+                .body(responseBody);
     }
     public Instant getTimestamp(UUID uuid) {
         return uuidMap.get(uuid);
