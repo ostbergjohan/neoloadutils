@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # NeoLoad Utils
 
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-johanostberg%2Fneoloadutils-blue)](https://hub.docker.com/repository/docker/johanostberg/neoloadutils)
@@ -34,24 +33,6 @@ A high-performance helper application designed to provide additional functionali
 
 A comprehensive helper application providing additional functionality for performance testing with NeoLoad Test-as-Code. Also compatible with other performance testing tools like JMeter and k6.
 
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Quick Start](#-quick-start)
-- [API Documentation](#-api-documentation)
-- [Core Features](#-core-features)
-  - [Pacing Control](#1-pacing-control)
-  - [Date/Time Parameters](#2-datetime-parameters)
-  - [Database Operations](#3-database-operations)
-  - [UUID Generation](#4-uuid-generation)
-  - [URL Management](#5-url-management)
-  - [HTTP Conversion](#6-http-conversion)
-  - [YAML Generation](#7-neoload-yaml-generation)
-- [Configuration](#%EF%B8%8F-configuration)
-- [Deployment](#-deployment)
-- [CI/CD Integration](#-cicd-integration)
-- [Complete Examples](#-complete-examples)
-
 ## ✨ Features
 
 - 🕐 **Intelligent Pacing Control** - Precise iteration timing for realistic load testing
@@ -61,17 +42,6 @@ A comprehensive helper application providing additional functionality for perfor
 - 📝 **YAML Configuration Generator** - Auto-generate NeoLoad YAML configurations from JSON
 - 🆔 **UUID Generation** - Generate unique identifiers for test correlation
 - 📊 **OpenAPI Documentation** - Interactive API documentation via Swagger UI
-
-## 🚀 Quick Start
-
-### Run with Docker
-
-```bash
-docker run -d \
-  -p 8080:8080 \
-  --name neoloadutils \
-  your-registry/neoloadutils:latest
-```
 
 ### Run Locally
 
@@ -139,11 +109,9 @@ sla_profiles:
 - name: sla
   thresholds:
     - error-rate warn >= 0.1% fail >= 0.2% per test
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
 ### 1. Pacing Control
 
-<<<<<<< HEAD
 Control iteration pacing in your performance tests with microsecond precision.
 
 #### **Start Pacing**
@@ -269,7 +237,6 @@ Content-Type: application/json
 **Request:**
 ```json
 {
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
   "dateformatter": "yyyy-MM-dd HH:mm:ss z",
   "daysToAddOrSubtract": "0"
 }
@@ -460,7 +427,6 @@ Content-Type: application/json
 }
 ```
 
-<<<<<<< HEAD
 **Parameters:**
 - `query` (string) - SQL SELECT query to execute
 - `jdbc` (string) - JDBC connection URL
@@ -495,7 +461,6 @@ Content-Type: application/json
     [8, "Hank", "Logistics", 68000],
     [9, "Ivy", "Legal", 88000],
     [10, "Jack", "Product", 92000]
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
   ]
 }
 ```
@@ -642,7 +607,6 @@ GET /getuuid
 }
 ```
 
-<<<<<<< HEAD
 ---
 
 ### 5. URL Management
@@ -711,13 +675,11 @@ GET /geturl
 ```
 
 Returns an HTML page with all stored URLs in a sortable table format.
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
 ---
 
 ### 6. HTTP Conversion
 
-<<<<<<< HEAD
 Convert raw HTTP requests to structured JSON format.
 
 **Endpoint:** `POST /convertHTTP`
@@ -746,14 +708,11 @@ Host: api.example.com
 Content-Type: application/json
 Authorization: Bearer token123
 
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 {
   "name": "John Doe",
   "email": "john@example.com"
 }
 ```
-<<<<<<< HEAD
-=======
 
 **Response:**
 ```json
@@ -784,7 +743,6 @@ Content-Type: application/json
 ```
 
 #### Request Example
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
 **Response:**
 ```json
@@ -843,7 +801,7 @@ Generate NeoLoad test configuration files from JSON input.
           "jsonpath": "$.id"
         }
       ]
-=======
+
   "name": "API Load Test",
   "scenario": "production_load",
   "pacing": "2000",
@@ -882,13 +840,11 @@ Generate NeoLoad test configuration files from JSON input.
       "name": "userdata",
       "column_names": ["username", "password"],
       "path": "test-data/users.csv"
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
     }
   ]
 }
 ```
 
-<<<<<<< HEAD
 **Response:** YAML file download
 
 ---
@@ -1041,7 +997,6 @@ user_paths:
               regexp: true
     - request:
         url: http://neoloadutils:8080/getpacing?guid=${pUUID}&totalPacingTimeMillis=${pPacing}
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 ```
 
 ---
@@ -1098,7 +1053,6 @@ logging.level.com.neoloadutils=DEBUG
 
 # Spring configuration
 spring.main.allow-bean-definition-overriding=false
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 ```
 
 ---
@@ -1219,164 +1173,9 @@ spring:
 =======
 ## 🐳 Deployment
 
-### Docker
-
-#### Build Image
-
-```bash
-docker build -t neoloadutils:latest .
-```
-
-#### Run Container
-
-```bash
-docker run -d \
-  -p 8080:8080 \
-  --name neoloadutils \
-  --restart unless-stopped \
-  neoloadutils:latest
-```
-
-### Kubernetes
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: neoloadutils
-  labels:
-    app: neoloadutils
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: neoloadutils
-  template:
-    metadata:
-      labels:
-        app: neoloadutils
-    spec:
-      containers:
-      - name: neoloadutils
-        image: neoloadutils:latest
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: neoloadutils
-spec:
-  selector:
-    app: neoloadutils
-  ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
-  type: ClusterIP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: neoloadutils
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-  - host: neoloadutils.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: neoloadutils
-            port:
-              number: 8080
-```
-
-### OpenShift
-
-```yaml
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
-metadata:
-  name: neoloadutils
-spec:
-  replicas: 2
-  selector:
-    app: neoloadutils
-  template:
-    metadata:
-      labels:
-        app: neoloadutils
-    spec:
-      containers:
-      - name: neoloadutils
-        image: neoloadutils:latest
-        ports:
-        - containerPort: 8080
-        livenessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 8080
-          initialDelaySeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /healthcheck
-            port: 8080
-          initialDelaySeconds: 5
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: neoloadutils
-spec:
-  selector:
-    app: neoloadutils
-  ports:
-  - port: 8080
-    targetPort: 8080
----
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: neoloadutils
-  annotations:
-    haproxy.router.openshift.io/timeout: 60s  # Adjust timeout for pacing
-spec:
-  to:
-    kind: Service
-    name: neoloadutils
-  port:
-    targetPort: 8080
-  tls:
-    termination: edge
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
-```
 
 ---
 
-<<<<<<< HEAD
 ### Environment Variables
 
 | Variable | Description | Default |
@@ -1720,4 +1519,3 @@ This project is licensed under the Apache License 2.0.
 ---
 
 Made with ❤️ for performance engineers
->>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
