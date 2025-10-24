@@ -1,3 +1,31 @@
+<<<<<<< HEAD
+# NeoLoad Utils
+
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-johanostberg%2Fneoloadutils-blue)](https://hub.docker.com/repository/docker/johanostberg/neoloadutils)
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.4-brightgreen)](https://spring.io/projects/spring-boot)
+
+A high-performance helper application designed to provide additional functionality during performance testing with **NeoLoad Test-as-Code**. Also compatible with other performance testing tools like **JMeter** and **K6**.
+
+---
+
+
+## 🚀 Features
+
+- **Pacing Control** - Manage iteration pacing with high-precision timing
+- **Dynamic Date/Time Generation** - Create timestamps with flexible formatting and weekday filtering
+- **SQL Query Execution** - Execute queries against multiple database types (MySQL, PostgreSQL, Oracle, SQL Server, SQLite)
+- **UUID Generation** - Generate unique identifiers for test data
+- **NeoLoad YAML Generator** - Automatically create NeoLoad test configurations
+- **HTTP Request Conversion** - Transform raw HTTP requests to structured JSON
+- **URL Management** - Store and retrieve test URLs with descriptions
+- **Multi-threaded Performance** - Optimized for high-volume test execution
+
+---
+
+
+## 📡 API Endpoints
+=======
 # 🛠️ NeoLoad Utils
 
 [![GitHub](https://img.shields.io/badge/GitHub-ostbergjohan%2Fneoloadutils-black)](https://github.com/ostbergjohan/neoloadutils)
@@ -111,13 +139,76 @@ sla_profiles:
 - name: sla
   thresholds:
     - error-rate warn >= 0.1% fail >= 0.2% per test
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
-populations: 
-- name: pop1
-  user_paths:
-    - name: example_userpath
-      distribution: 100%
+### 1. Pacing Control
 
+<<<<<<< HEAD
+Control iteration pacing in your performance tests with microsecond precision.
+
+#### **Start Pacing**
+
+Captures the start timestamp for pacing calculations.
+
+**Endpoint:** `GET /setpacing`
+
+**Example:**
+```bash
+curl http://localhost:8080/setpacing
+```
+
+**Response:**
+```json
+{
+  "uuid": "2602c87e-b736-4d8c-b7fe-ba62916875fd"
+}
+```
+
+---
+
+#### **End Pacing**
+
+Calculates remaining pacing time and sleeps if necessary to maintain desired pacing.
+
+**Endpoint:** `GET /getpacing`
+
+**Parameters:**
+- `guid` (required) - UUID from setpacing call
+- `totalPacingTimeMillis` (required) - Total pacing time in milliseconds
+
+**Example:**
+```bash
+curl "http://localhost:8080/getpacing?guid=2602c87e-b736-4d8c-b7fe-ba62916875fd&totalPacingTimeMillis=1000"
+```
+
+**Response:**
+```json
+{
+  "uuid": "2602c87e-b736-4d8c-b7fe-ba62916875fd",
+  "duration": 234
+}
+```
+
+> **⚠️ Platform Considerations:**  
+> Be aware of platform timeout limitations. For example, OpenShift routes have a default timeout of 30 seconds. Pacing durations should not exceed platform limits.
+
+> **💡 NeoLoad Trend View:**  
+> In NeoLoad Web's trend view, pacing requests should be excluded from analysis as they are utility calls and may skew performance metrics.
+
+---
+
+### 2. Date/Time Parameters
+
+Generate dynamic date/time parameters with flexible formatting and business day filtering.
+
+#### **Standard Date Generation**
+
+**Endpoint:** `POST /getparameter`
+
+**Request Body:**
+```json
+{
+=======
 scenarios:
 - name: pacing_scenario
   description: Example scenario with pacing
@@ -178,6 +269,7 @@ Content-Type: application/json
 **Request:**
 ```json
 {
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
   "dateformatter": "yyyy-MM-dd HH:mm:ss z",
   "daysToAddOrSubtract": "0"
 }
@@ -190,6 +282,61 @@ Content-Type: application/json
 }
 ```
 
+<<<<<<< HEAD
+---
+
+#### **Weekday-Only Date Generation**
+
+Automatically skips weekends to generate business day dates.
+
+**Request Body:**
+```json
+{
+  "dateformatter_weekdays": "yyyy-MM-dd HH:mm:ss z",
+  "daysToAddOrSubtract": "5"
+}
+```
+
+**Response:**
+```json
+{
+  "date": "2024-10-22 13:58:10 CEST"
+}
+```
+
+---
+
+#### **DateTimeFormatter Patterns**
+
+| Symbol | Description | Example |
+|--------|-------------|---------|
+| `yyyy` | Year | 2024 |
+| `MM` | Month (01-12) | 10 |
+| `dd` | Day of month (01-31) | 15 |
+| `HH` | Hour (24-hour) | 13 |
+| `mm` | Minute | 58 |
+| `ss` | Second | 10 |
+| `EEEE` | Day of week | Monday |
+| `MMMM` | Full month name | October |
+| `z` | Time zone | CEST |
+
+For more patterns, see the [Java DateTimeFormatter documentation](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html).
+
+---
+
+### 3. SQL Execution
+
+Execute SQL queries against various databases and retrieve results in JSON format.
+
+#### **Execute SELECT Query**
+
+**Endpoint:** `POST /executeSQL`
+
+**Request Body:**
+```json
+{
+  "query": "SELECT * FROM employees WHERE department = 'Engineering'",
+=======
 #### Weekday-Only Date Generation
 
 Skips weekends when calculating dates:
@@ -304,6 +451,7 @@ Content-Type: application/json
 ```json
 {
   "query": "SELECT id, name, department, salary FROM employees WHERE status = 'active'",
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
   "jdbc": "jdbc:mysql://localhost:3306/mydatabase",
   "user": "dbuser",
   "password": "dbpassword",
@@ -312,6 +460,26 @@ Content-Type: application/json
 }
 ```
 
+<<<<<<< HEAD
+**Parameters:**
+- `query` (string) - SQL SELECT query to execute
+- `jdbc` (string) - JDBC connection URL
+- `user` (string) - Database username
+- `password` (string) - Database password
+- `numRows` (integer) - Number of rows to return (≥ 1)
+- `randomize` (boolean) - Randomize result order
+
+**Response:**
+```json
+{
+  "columns": ["id", "name", "department", "email"],
+  "values": [
+    [1, "Alice", "Engineering", "alice@example.com"],
+    [2, "Bob", "Engineering", "bob@example.com"],
+    [5, "Eve", "Engineering", "eve@example.com"],
+    [7, "Grace", "Engineering", "grace@example.com"],
+    [10, "Jack", "Engineering", "jack@example.com"]
+=======
 **Response:**
 ```json
 {
@@ -327,10 +495,54 @@ Content-Type: application/json
     [8, "Hank", "Logistics", 68000],
     [9, "Ivy", "Legal", 88000],
     [10, "Jack", "Product", 92000]
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
   ]
 }
 ```
 
+<<<<<<< HEAD
+---
+
+#### **Execute Non-SELECT Queries**
+
+For INSERT, UPDATE, DELETE operations.
+
+**Endpoint:** `POST /executeNonSelectSQL`
+
+**Request Body:**
+```json
+{
+  "query": "UPDATE employees SET status = 'active' WHERE id = 1; DELETE FROM temp_data WHERE created < NOW() - INTERVAL 7 DAY;",
+  "jdbc": "jdbc:mysql://localhost:3306/mydatabase",
+  "user": "dbuser",
+  "password": "dbpassword"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "executed": [
+    {"updateCount": 1},
+    {"updateCount": 15}
+  ],
+  "timeTakenSeconds": 0.34
+}
+```
+
+---
+
+#### **Supported Databases**
+
+| Database | JDBC Driver | Example URL |
+|----------|-------------|-------------|
+| MySQL | `mysql-connector-j` | `jdbc:mysql://host:3306/db` |
+| PostgreSQL | `postgresql` | `jdbc:postgresql://host:5432/db` |
+| Oracle | `ojdbc11` | `jdbc:oracle:thin:@host:1521:sid` |
+| SQL Server | `mssql-jdbc` | `jdbc:sqlserver://host:1433;databaseName=db` |
+| SQLite | `sqlite-jdbc` | `jdbc:sqlite:/path/to/database.db` |
+=======
 #### Parameters
 
 | Parameter | Type | Required | Description |
@@ -399,17 +611,28 @@ jdbc:sqlserver://hostname:1433;databaseName=database
 ```
 jdbc:sqlite:/path/to/database.db
 ```
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
 ---
 
 ### 4. UUID Generation
 
+<<<<<<< HEAD
+Generate RFC 4122 compliant UUIDs for test data.
+
+**Endpoint:** `GET /getuuid`
+
+**Example:**
+```bash
+curl http://localhost:8080/getuuid
+=======
 Generate unique identifiers for test correlation and tracking.
 
 #### API Endpoint
 
 ```http
 GET /getuuid
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 ```
 
 **Response:**
@@ -419,6 +642,44 @@ GET /getuuid
 }
 ```
 
+<<<<<<< HEAD
+---
+
+### 5. URL Management
+
+Store and retrieve test URLs with descriptions.
+
+#### **Add URL**
+
+**Endpoint:** `GET /addurl`
+
+**Parameters:**
+- `url` (string) - URL to store
+- `explanation` (string) - Description/explanation
+
+**Example:**
+```bash
+curl "http://localhost:8080/addurl?url=https://api.example.com/users&explanation=User%20API%20endpoint"
+```
+
+**Response:**
+```
+URL added successfully!
+```
+
+---
+
+#### **List URLs**
+
+**Endpoint:** `GET /geturl`
+
+Returns an HTML page displaying all stored URLs sorted by explanation.
+
+**Example:**
+```bash
+curl http://localhost:8080/geturl
+```
+=======
 #### Use Cases
 
 - Correlate requests across transactions
@@ -450,11 +711,25 @@ GET /geturl
 ```
 
 Returns an HTML page with all stored URLs in a sortable table format.
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
 ---
 
 ### 6. HTTP Conversion
 
+<<<<<<< HEAD
+Convert raw HTTP requests to structured JSON format.
+
+**Endpoint:** `POST /convertHTTP`
+
+**Request Body:**
+```
+POST /api/users HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer xyz123
+
+=======
 Convert raw HTTP requests into structured JSON format for easier processing.
 
 #### API Endpoint
@@ -471,11 +746,14 @@ Host: api.example.com
 Content-Type: application/json
 Authorization: Bearer token123
 
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 {
   "name": "John Doe",
   "email": "john@example.com"
 }
 ```
+<<<<<<< HEAD
+=======
 
 **Response:**
 ```json
@@ -506,9 +784,66 @@ Content-Type: application/json
 ```
 
 #### Request Example
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 
+**Response:**
 ```json
 {
+<<<<<<< HEAD
+  "name": "transaction name",
+  "url": "https://api.example.com/api/users",
+  "method": "POST",
+  "body": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\"\n}",
+  "headers": {
+    "Host": "api.example.com",
+    "Content-Type": "application/json",
+    "Authorization": "Bearer xyz123"
+  }
+}
+```
+
+---
+
+### 7. NeoLoad YAML Generation
+
+Generate NeoLoad test configuration files from JSON input.
+
+**Endpoint:** `POST /NeoLoadYamlGenerator`
+
+**Request Body:**
+```json
+{
+  "name": "User API Test",
+  "scenario": "LoadTest",
+  "pacing": "1000",
+  "users": 10,
+  "duration": 5,
+  "userpathname": "user_api_path",
+  "transactions": [
+    {
+      "name": "Get Users",
+      "url": "https://api.example.com/users",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer token123"
+      },
+      "assertion": ".*\"status\":\"success\".*"
+    },
+    {
+      "name": "Create User",
+      "url": "https://api.example.com/users",
+      "method": "POST",
+      "body": "{\"name\":\"Test User\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "extractors": [
+        {
+          "name": "userId",
+          "jsonpath": "$.id"
+        }
+      ]
+=======
   "name": "API Load Test",
   "scenario": "production_load",
   "pacing": "2000",
@@ -547,11 +882,74 @@ Content-Type: application/json
       "name": "userdata",
       "column_names": ["username", "password"],
       "path": "test-data/users.csv"
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
     }
   ]
 }
 ```
 
+<<<<<<< HEAD
+**Response:** YAML file download
+
+---
+
+## 📚 Examples
+
+### Example 1: NeoLoad Pacing Implementation
+
+```yaml
+name: pacing_example
+
+variables:
+  - constant:
+      name: pPacing
+      value: 1000  # 1 second pacing
+
+sla_profiles:
+  - name: sla
+    thresholds:
+      - error-rate warn >= 0.1% fail >= 0.2% per test
+
+populations:
+  - name: pop1
+    user_paths:
+      - name: example_userpath
+        distribution: 100%
+
+scenarios:
+  - name: LoadTest
+    description: Example scenario with pacing
+    sla_profile: sla
+    populations:
+      - name: pop1
+        constant_load:
+          users: 5
+          duration: 2m
+
+user_paths:
+  - name: example_userpath
+    actions:
+      steps:
+        # Start pacing measurement
+        - request:
+            url: http://localhost:8080/setpacing
+            extractors:
+              - name: pUUID
+                jsonpath: $.uuid
+
+        # Your actual test transaction
+        - transaction:
+            name: API Call
+            description: Test API endpoint
+            steps:
+              - request:
+                  url: https://api.example.com/data
+                  method: GET
+
+        # End pacing - waits for remaining time
+        - request:
+            url: http://localhost:8080/getpacing?guid=${pUUID}&totalPacingTimeMillis=${pPacing}
+=======
 #### Response (YAML)
 
 ```yaml
@@ -643,10 +1041,47 @@ user_paths:
               regexp: true
     - request:
         url: http://neoloadutils:8080/getpacing?guid=${pUUID}&totalPacingTimeMillis=${pPacing}
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 ```
 
 ---
 
+<<<<<<< HEAD
+### Example 2: Dynamic Date Parameters
+
+```yaml
+name: date_parameter_example
+
+user_paths:
+  - name: date_test_path
+    actions:
+      steps:
+        # Generate date parameter
+        - transaction:
+            name: Generate Date
+            description: Creates dynamic date parameter
+            steps:
+              - request:
+                  url: http://localhost:8080/getparameter
+                  method: POST
+                  body: |-
+                    {
+                      "dateformatter": "yyyy-MM-dd",
+                      "daysToAddOrSubtract": "-7"
+                    }
+                  extractors:
+                    - name: pDate
+                      jsonpath: $.date
+
+        # Use date in API call
+        - transaction:
+            name: Query with Date
+            description: API call with dynamic date
+            steps:
+              - request:
+                  url: https://api.example.com/reports?date=${pDate}
+                  method: GET
+=======
 ## ⚙️ Configuration
 
 ### Application Properties
@@ -663,10 +1098,125 @@ logging.level.com.neoloadutils=DEBUG
 
 # Spring configuration
 spring.main.allow-bean-definition-overriding=false
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 ```
 
 ---
 
+<<<<<<< HEAD
+### Example 3: SQL Data Retrieval
+
+```yaml
+name: sql_data_example
+
+user_paths:
+  - name: sql_test_path
+    actions:
+      steps:
+        # Fetch test data from database
+        - transaction:
+            name: Get Test Data
+            description: Retrieve employee data
+            steps:
+              - request:
+                  url: http://localhost:8080/executeSQL
+                  method: POST
+                  body: |-
+                    {
+                      "query": "SELECT id, email FROM users WHERE status = 'active'",
+                      "jdbc": "jdbc:mysql://db.example.com:3306/testdb",
+                      "user": "testuser",
+                      "password": "testpass",
+                      "numRows": 100,
+                      "randomize": true
+                    }
+                  extractors:
+                    - name: userId
+                      jsonpath: $.values[0][0]
+                    - name: userEmail
+                      jsonpath: $.values[0][1]
+
+        # Use extracted data in test
+        - transaction:
+            name: Test User Profile
+            description: Access user profile with DB data
+            steps:
+              - request:
+                  url: https://api.example.com/users/${userId}
+                  method: GET
+```
+
+---
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+
+services:
+  neoloadutils:
+    image: johanostberg/neoloadutils:latest
+    container_name: neoloadutils
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+```
+
+---
+
+## 🛠️ Installation
+
+### Prerequisites
+
+- Java 21 or higher
+- Maven 3.6 or higher
+
+### Build from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/ostbergjohan/neoloadutils.git
+cd neoloadutils
+
+# Build with Maven
+mvn clean install
+
+# Run the application
+java -jar target/NeoLoadUtils-0.0.1-SNAPSHOT.jar
+```
+
+---
+
+
+## ⚙️ Configuration
+
+### Application Properties
+
+Create `application.properties` or `application.yml`:
+
+```yaml
+# Server Configuration
+server:
+  port: 8080
+
+# Logging
+logging:
+  level:
+    com.neoloadutils: INFO
+    org.springframework: WARN
+
+# Spring Boot
+spring:
+  application:
+    name: NeoLoadUtils
+=======
 ## 🐳 Deployment
 
 ### Docker
@@ -821,10 +1371,36 @@ spec:
     targetPort: 8080
   tls:
     termination: edge
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
 ```
 
 ---
 
+<<<<<<< HEAD
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SERVER_PORT` | Server port | 8080 |
+| `SPRING_PROFILES_ACTIVE` | Active profile | default |
+| `LOG_LEVEL` | Logging level | INFO |
+
+---
+
+
+## 🔒 Security Considerations
+
+⚠️ **Important Security Notes:**
+
+1. **SQL Injection Risk** - The `/executeSQL` endpoint executes raw SQL. Use only in test environments.
+2. **Database Credentials** - Credentials are passed in request bodies. Use HTTPS in production.
+3. **Authentication** - No built-in authentication. Implement API gateway or Spring Security if needed.
+4. **Rate Limiting** - Consider implementing rate limiting for production deployments.
+
+---
+
+**Made with ❤️ for Performance Testing**
+=======
 ## 🔄 CI/CD Integration
 
 ### Jenkins Pipeline
@@ -1144,3 +1720,4 @@ This project is licensed under the Apache License 2.0.
 ---
 
 Made with ❤️ for performance engineers
+>>>>>>> cebad8db68d09aeb5adf440e6badb341a47ee14f
